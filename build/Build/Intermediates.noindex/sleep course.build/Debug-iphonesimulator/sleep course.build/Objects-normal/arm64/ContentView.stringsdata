@@ -1,0 +1,16 @@
+{
+  "source": "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Hello, world!",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 16
+        }
+      }
+    ]
+  },
+  "version": 1
+}
