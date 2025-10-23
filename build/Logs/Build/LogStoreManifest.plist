@@ -5,6 +5,175 @@
 	<key>logFormatVersion</key>
 	<integer>11</integer>
 	<key>logs</key>
-	<dict/>
+	<dict>
+		<key>0C0AB5DA-42DC-4F96-A3A5-3CDCEA53C6C4</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>0C0AB5DA-42DC-4F96-A3A5-3CDCEA53C6C4.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>sleep course project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>sleep course</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning project sleep course with scheme sleep course and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>782756004.90258396</real>
+			<key>timeStoppedRecording</key>
+			<real>782756005.64862597</real>
+			<key>title</key>
+			<string>Cleaning project sleep course with scheme sleep course and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>0C0AB5DA-42DC-4F96-A3A5-3CDCEA53C6C4</string>
+		</dict>
+		<key>1CDBE3A5-8D72-44E4-8C46-1746D01D2EA2</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>1CDBE3A5-8D72-44E4-8C46-1746D01D2EA2.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>1</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>3</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>sleep course project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>sleep course</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project sleep course with scheme sleep course and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>782755725.81601799</real>
+			<key>timeStoppedRecording</key>
+			<real>782755737.19303095</real>
+			<key>title</key>
+			<string>Building project sleep course with scheme sleep course and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>1CDBE3A5-8D72-44E4-8C46-1746D01D2EA2</string>
+		</dict>
+		<key>5574A419-6AF9-4CE9-B7C0-01144769A939</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>5574A419-6AF9-4CE9-B7C0-01144769A939.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>4</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>sleep course project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>sleep course</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project sleep course with scheme sleep course and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>782756005.66617703</real>
+			<key>timeStoppedRecording</key>
+			<real>782756020.47339296</real>
+			<key>title</key>
+			<string>Building project sleep course with scheme sleep course and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>5574A419-6AF9-4CE9-B7C0-01144769A939</string>
+		</dict>
+		<key>57FDB9CE-5636-42F6-81EF-B6F76A962529</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>57FDB9CE-5636-42F6-81EF-B6F76A962529.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>sleep course project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>sleep course</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning project sleep course with scheme sleep course and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>782755725.24397099</real>
+			<key>timeStoppedRecording</key>
+			<real>782755725.80576503</real>
+			<key>title</key>
+			<string>Cleaning project sleep course with scheme sleep course and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>57FDB9CE-5636-42F6-81EF-B6F76A962529</string>
+		</dict>
+	</dict>
 </dict>
 </plist>

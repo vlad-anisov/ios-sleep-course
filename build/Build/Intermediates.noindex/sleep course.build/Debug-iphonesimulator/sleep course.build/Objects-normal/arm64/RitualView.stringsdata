@@ -1,0 +1,32 @@
+{
+  "source": "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/Views/RitualView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "✨",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ritual is done",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 23
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Ritual",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 30
+        }
+      }
+    ]
+  },
+  "version": 1
+}

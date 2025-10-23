@@ -1,0 +1,32 @@
+{
+  "source": "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/Views/ChatView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Чат",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Eva печатает...",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Напишите сообщение...",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 70
+        }
+      }
+    ]
+  },
+  "version": 1
+}

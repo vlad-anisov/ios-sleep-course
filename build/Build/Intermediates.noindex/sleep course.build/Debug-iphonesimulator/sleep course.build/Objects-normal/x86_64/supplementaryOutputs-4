@@ -1,0 +1,23 @@
+{
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ViewModels/SettingsViewModel.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/SettingsViewModel.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/SettingsViewModel.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/SettingsViewModel.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/SettingsViewModel.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/SettingsViewModel.swiftdeps"
+  },
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ViewModels/StatisticsViewModel.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/StatisticsViewModel.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/StatisticsViewModel.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/StatisticsViewModel.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/StatisticsViewModel.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/StatisticsViewModel.swiftdeps"
+  },
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/Views/ArticleDetailView.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/ArticleDetailView.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/ArticleDetailView.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/ArticleDetailView.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/ArticleDetailView.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/x86_64/ArticleDetailView.swiftdeps"
+  }
+}

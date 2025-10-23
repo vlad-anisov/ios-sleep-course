@@ -1,0 +1,7 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project "sleep course.xcodeproj" -scheme "sleep course" -destination "platform=iOS Simulator,name=iPhone 17 Pro" "-only-testing:sleep_courseUITests/SleepCourseUITests"
+
+2025-10-21 19:32:43.647 xcodebuild[60056:182765682] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2025-10-21 19:32:43.654 xcodebuild[60056:182765682] Writing error result bundle to /var/folders/_1/qjyh3df171vg_7qq7n15_tv40000gn/T/ResultBundle_2025-21-10_19-32-0043.xcresult
+xcodebuild: error: Scheme sleep course is not currently configured for the test action.
+

@@ -1,0 +1,23 @@
+{
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ViewModels/ArticlesViewModel.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ArticlesViewModel.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ArticlesViewModel.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ArticlesViewModel.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ArticlesViewModel.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ArticlesViewModel.swiftdeps"
+  },
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ViewModels/ChatViewModel.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ChatViewModel.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ChatViewModel.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ChatViewModel.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ChatViewModel.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/ChatViewModel.swiftdeps"
+  },
+  "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/ViewModels/RitualViewModel.swift" : {
+    "const-values" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/RitualViewModel.swiftconstvalues",
+    "dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/RitualViewModel.d",
+    "diagnostics" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/RitualViewModel.dia",
+    "object" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/RitualViewModel.o",
+    "swift-dependencies" : "/Users/vlad/Desktop/ios_sleep/sleep course/build/Build/Intermediates.noindex/sleep course.build/Debug-iphonesimulator/sleep course.build/Objects-normal/arm64/RitualViewModel.swiftdeps"
+  }
+}

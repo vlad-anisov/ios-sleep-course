@@ -1,0 +1,16 @@
+{
+  "source": "/Users/vlad/Desktop/ios_sleep/sleep course/sleep course/Views/ArticlesView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Articles",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 32
+        }
+      }
+    ]
+  },
+  "version": 1
+}
