@@ -121,9 +121,9 @@ struct sleep_courseApp: App {
             }
         }
         
-        // Проверяем, есть ли уже данные
-        let descriptor = FetchDescriptor<Article>()
-        let existingArticles = (try? context.fetch(descriptor)) ?? []
+        // Проверяем, есть ли уже статьи
+        let articlesDescriptor = FetchDescriptor<Article>()
+        let existingArticles = (try? context.fetch(articlesDescriptor)) ?? []
         
         if existingArticles.isEmpty {
             // Добавляем начальные статьи
@@ -142,30 +142,47 @@ struct sleep_courseApp: App {
                 )
                 context.insert(article)
             }
+            try? context.save()
+        }
+        
+        // Проверяем, есть ли уже ритуалы (отдельная проверка!)
+        let ritualsDescriptor = FetchDescriptor<Ritual>()
+        let existingRituals = (try? context.fetch(ritualsDescriptor)) ?? []
+        
+        if existingRituals.isEmpty {
+            print("🔄 Создаём начальный ритуал и линии...")
             
             // Добавляем начальный ритуал
             let ritual = Ritual(
                 id: 1,
                 name: "Вечерний ритуал",
-                userId: 1
+                userId: 1,
+                sequence: 0
             )
+            context.insert(ritual)
             
             // Добавляем линии ритуала
             let mockLines = [
-                RitualLine(id: 54, name: "Медитация 🧘", sequence: 6, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 89, name: "Скушать киви 🥝", sequence: 10, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 88, name: "Проветрить комнату 💨", sequence: 11, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 87, name: "Приглушить свет 💡", sequence: 12, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 86, name: "Тёплая ванна 🛁", sequence: 13, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 85, name: "Надеть носки 🧦", sequence: 14, isCheck: false, isBase: true, isActive: true, ritual: ritual),
-                RitualLine(id: 84, name: "Закончить дела ✅", sequence: 15, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 54, name: "Медитация 🧘", sequence: 0, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 89, name: "Скушать киви 🥝", sequence: 1, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 88, name: "Проветрить комнату 💨", sequence: 2, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 87, name: "Приглушить свет 💡", sequence: 3, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 86, name: "Тёплая ванна 🛁", sequence: 4, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 85, name: "Надеть носки 🧦", sequence: 5, isCheck: false, isBase: true, isActive: true, ritual: ritual),
+                RitualLine(id: 84, name: "Закончить дела ✅", sequence: 6, isCheck: false, isBase: true, isActive: true, ritual: ritual),
             ]
             
-            ritual.lines = mockLines
-            context.insert(ritual)
+            mockLines.forEach { line in
+                context.insert(line)
+            }
             
-            // Сохраняем все изменения
+            ritual.lines = mockLines
+            
+            // Сохраняем ритуал и линии
             try? context.save()
+            print("✅ Ритуал и \(mockLines.count) линий созданы!")
+        } else {
+            print("✅ Ритуалы уже существуют: \(existingRituals.count) шт.")
         }
     }
 }

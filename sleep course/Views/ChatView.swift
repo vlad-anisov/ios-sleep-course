@@ -18,32 +18,6 @@ struct ChatView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Custom header with avatar and name
-                HStack(spacing: 12) {
-                    // Eva's avatar
-                    ZStack {
-                        Circle()
-                            .fill(LinearGradient(
-                                gradient: Gradient(colors: [Color(red: 0/255, green: 120/255, blue: 255/255), Color.purple]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
-                            .frame(width: 40, height: 40)
-                        
-                        Text("E")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
-                    }
-                    
-                    Text("Eva")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    Spacer()
-                }
-                .padding()
-                .background(Color(red: 20/255, green: 30/255, blue: 54/255))
-                
                 // Messages list
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -75,15 +49,15 @@ struct ChatView: View {
                                                 .foregroundColor(.white)
                                                 .frame(maxWidth: .infinity)
                                                 .padding(.vertical, 14)
-                                .background(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [Color(red: 0/255, green: 120/255, blue: 255/255).opacity(0.8), Color(red: 0/255, green: 120/255, blue: 255/255)]),
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
-                                .cornerRadius(25)
-                                .shadow(color: Color(red: 0/255, green: 120/255, blue: 255/255).opacity(0.6), radius: 10, x: 0, y: 3)
+                                                .background(
+                                                    LinearGradient(
+                                                        gradient: Gradient(colors: [Color(red: 0/255, green: 120/255, blue: 255/255).opacity(0.8), Color(red: 0/255, green: 120/255, blue: 255/255)]),
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    )
+                                                )
+                                                .cornerRadius(25)
+                                                .shadow(color: Color(red: 0/255, green: 120/255, blue: 255/255).opacity(0.6), radius: 10, x: 0, y: 3)
                                         }
                                     }
                                 }
@@ -93,7 +67,6 @@ struct ChatView: View {
                         }
                         .padding(.vertical, 8)
                     }
-                    .background(Color(red: 20/255, green: 30/255, blue: 54/255))
                     .onChange(of: messages.count) { _, newCount in
                         if let lastMessage = messages.last {
                             withAnimation {
@@ -103,8 +76,32 @@ struct ChatView: View {
                     }
                 }
             }
-            .background(Color(red: 20/255, green: 30/255, blue: 54/255))
-            .navigationBarHidden(true)
+            .background(Color.appBackground)
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 12) {
+                        // Eva's avatar
+                        ZStack {
+                            Circle()
+                                .fill(LinearGradient(
+                                    gradient: Gradient(colors: [Color(red: 0/255, green: 120/255, blue: 255/255), Color.purple]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ))
+                                .frame(width: 40, height: 40)
+                            
+                            Text("E")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.white)
+                        }
+                        
+                        Text("Eva")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                }
+            }
             .onAppear {
                 startScriptIfNeeded()
             }
@@ -281,7 +278,7 @@ struct MessageBubble: View {
                 .background(
                     message.isFromUser
                         ? AnyView(Color(red: 0/255, green: 120/255, blue: 255/255))
-                        : AnyView(Color(red: 26/255, green: 40/255, blue: 72/255))
+                        : AnyView(Color.messageBubbleEva)
                 )
                 .clipShape(
                     MessageBubbleShape(

@@ -27,7 +27,7 @@ struct ArticlesView: View {
             .listStyle(.plain)
             .scrollIndicators(.hidden)
             .navigationLinkIndicatorVisibility(.hidden)
-            .background(Color(red: 20/255, green: 30/255, blue: 54/255))
+            .background(Color.appBackground)
             .navigationTitle("Статьи")
         }
     }
