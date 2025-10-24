@@ -13,7 +13,7 @@ struct RitualView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 if let ritual = ritual {
                     if ritual.isCheck && !isEditMode {
@@ -128,16 +128,6 @@ struct RitualView: View {
                 if let ritual = ritual {
                     AddTaskSheet(ritual: ritual, modelContext: modelContext)
                 }
-            }
-            .onAppear {
-                let appearance = UINavigationBarAppearance()
-                appearance.configureWithTransparentBackground()
-                appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
-                
-                let navigationBar = UINavigationBar.appearance()
-                navigationBar.standardAppearance = appearance
-                navigationBar.scrollEdgeAppearance = appearance
-                navigationBar.compactAppearance = appearance
             }
         }
     }
@@ -360,7 +350,7 @@ struct AddTaskSheet: View {
     private let customBlue = Color(red: 0/255, green: 120/255, blue: 255/255)
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 if showCreateCustomTask {
                     // Форма создания кастомной задачи

@@ -16,7 +16,7 @@ struct ChatView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Custom header with avatar and name
                 HStack(spacing: 12) {

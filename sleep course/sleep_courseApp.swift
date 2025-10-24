@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct sleep_courseApp: App {
@@ -7,6 +8,8 @@ struct sleep_courseApp: App {
     let modelContainer: ModelContainer
     
     init() {
+        // Настраиваем delegate для показа уведомлений на переднем плане
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         do {
             // Настройка SwiftData ModelContainer со всеми моделями
             let schema = Schema([
@@ -15,7 +18,7 @@ struct sleep_courseApp: App {
                 RitualLine.self,
                 Article.self,
                 Statistic.self,
-                AppSettings.self,
+                Settings.self,
                 Script.self,
                 ScriptStep.self
             ])
@@ -43,7 +46,7 @@ struct sleep_courseApp: App {
                     RitualLine.self,
                     Article.self,
                     Statistic.self,
-                    AppSettings.self,
+                    Settings.self,
                     Script.self,
                     ScriptStep.self
                 ])
@@ -81,6 +84,42 @@ struct sleep_courseApp: App {
     
     private func initializeDataIfNeeded() {
         let context = ModelContext(modelContainer)
+        
+        // Проверяем и создаем настройки, если их нет
+        let settingsDescriptor = FetchDescriptor<Settings>()
+        let existingSettings = (try? context.fetch(settingsDescriptor)) ?? []
+        
+        if existingSettings.isEmpty {
+            let settings = Settings()
+            context.insert(settings)
+            try? context.save()
+            
+            // Запрашиваем разрешение и создаем первое уведомление
+            Task {
+                let center = UNUserNotificationCenter.current()
+                do {
+                    let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+                    print(granted ? "✅ Уведомления разрешены" : "⚠️ Уведомления запрещены")
+                    
+                    if granted {
+                        // Создаем первое уведомление
+                        let content = UNMutableNotificationContent()
+                        content.title = "Время ритуала"
+                        content.body = "Пора начать вечерний ритуал для здорового сна 🌙"
+                        content.sound = .default
+                        
+                        let components = Calendar.current.dateComponents([.hour, .minute], from: settings.notificationTime)
+                        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+                        let request = UNNotificationRequest(identifier: "daily_ritual", content: content, trigger: trigger)
+                        
+                        try await center.add(request)
+                        print("✅ Уведомление запланировано на \(components.hour!):\(String(format: "%02d", components.minute!))")
+                    }
+                } catch {
+                    print("⚠️ Ошибка настройки уведомлений: \(error)")
+                }
+            }
+        }
         
         // Проверяем, есть ли уже данные
         let descriptor = FetchDescriptor<Article>()
@@ -125,17 +164,35 @@ struct sleep_courseApp: App {
             ritual.lines = mockLines
             context.insert(ritual)
             
-            // Добавляем настройки по умолчанию
-            let settings = AppSettings(
-                colorScheme: .light,
-                language: "ru_RU",
-                timezone: "Europe/Moscow",
-                notificationTime: "22:00"
-            )
-            context.insert(settings)
-            
             // Сохраняем все изменения
             try? context.save()
         }
+    }
+}
+
+// MARK: - Notification Delegate для показа уведомлений на переднем плане
+
+class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = NotificationDelegate()
+    
+    // Показывать уведомления даже когда приложение активно
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        // Показываем баннер, звук и бейдж даже когда приложение на переднем плане
+        completionHandler([.banner, .sound, .badge])
+    }
+    
+    // Обработка нажатия на уведомление
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        print("📱 Пользователь нажал на уведомление")
+        // Здесь можно добавить переход на нужный экран
+        completionHandler()
     }
 }

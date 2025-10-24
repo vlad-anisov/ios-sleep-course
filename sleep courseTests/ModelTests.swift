@@ -101,27 +101,25 @@ final class ModelTests: XCTestCase {
     
     // MARK: - Settings Tests
     
-    func testSettingsDefault() {
-        let settings = AppSettings.default
+    func testSettingsInitialization() {
+        let settings = Settings()
         
-        XCTAssertEqual(settings.colorScheme, .light)
-        XCTAssertEqual(settings.language, "en_US")
-        XCTAssertEqual(settings.timezone, "UTC")
-        XCTAssertEqual(settings.notificationTime, "22:00")
+        // Проверяем, что время уведомления установлено на 23:00
+        let components = Calendar.current.dateComponents([.hour, .minute], from: settings.notificationTime)
+        XCTAssertEqual(components.hour, 23)
+        XCTAssertEqual(components.minute, 0)
     }
     
-    func testSettingsEncodeDecode() throws {
-        let settings = AppSettings.default
+    func testSettingsTimeUpdate() {
+        let settings = Settings()
         
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(settings)
+        // Проверяем, что время можно изменить
+        let newTime = Calendar.current.date(from: DateComponents(hour: 22, minute: 30)) ?? Date()
+        settings.notificationTime = newTime
         
-        let decoder = JSONDecoder()
-        let decoded = try decoder.decode(AppSettings.self, from: data)
-        
-        XCTAssertEqual(settings.colorScheme, decoded.colorScheme)
-        XCTAssertEqual(settings.language, decoded.language)
-        XCTAssertEqual(settings.timezone, decoded.timezone)
+        let components = Calendar.current.dateComponents([.hour, .minute], from: settings.notificationTime)
+        XCTAssertEqual(components.hour, 22)
+        XCTAssertEqual(components.minute, 30)
     }
     
     // MARK: - ChatMessage Tests

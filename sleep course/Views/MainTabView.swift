@@ -1,6 +1,8 @@
 import SwiftUI
+import SwiftData
 
 struct MainTabView: View {
+    @Query private var allSettings: [Settings]
 
     var body: some View {
         TabView {
@@ -14,15 +16,8 @@ struct MainTabView: View {
                 RitualView()
             }
             Tab("Настройки", systemImage: "gear"){
-                SettingsView()
+                SettingsView(settings: allSettings.first!)
             }
         }
-//        .accentColor(Color(red: 0/255, green: 120/255, blue: 255/255))
-//        .background(Color(red: 0/255, green: 120/255, blue: 255/255))
     }
 }
-
-#Preview {
-    MainTabView()
-}
-

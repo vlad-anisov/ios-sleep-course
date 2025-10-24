@@ -164,29 +164,5 @@ final class ViewModelTests: XCTestCase {
         XCTAssertEqual(lastWeek.count, 2) // Only last 7 days
     }
     
-    // MARK: - SettingsViewModel Tests
-    
-    func testSettingsViewModelSaveAndLoad() {
-        let viewModel = SettingsViewModel()
-        
-        viewModel.updateLanguage("ru_RU")
-        viewModel.updateTimezone("Europe/Moscow")
-        
-        // Create new instance to test persistence
-        let newViewModel = SettingsViewModel()
-        
-        XCTAssertEqual(newViewModel.settings.language, "ru_RU")
-        XCTAssertEqual(newViewModel.settings.timezone, "Europe/Moscow")
-    }
-    
-    func testSettingsViewModelResetToDefaults() {
-        let viewModel = SettingsViewModel()
-        
-        viewModel.updateLanguage("ru_RU")
-        viewModel.resetToDefaults()
-        
-        XCTAssertEqual(viewModel.settings.language, "en_US")
-        XCTAssertEqual(viewModel.settings.colorScheme, .light)
-    }
 }
 
