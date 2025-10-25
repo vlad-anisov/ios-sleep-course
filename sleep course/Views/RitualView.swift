@@ -19,18 +19,20 @@ struct RitualView: View {
             List {
                 ForEach(lines) { line in
                     HStack(spacing: 15) {
-                        Button {
-                            withAnimation{
-                                line.isCheck.toggle()
+                        if !isEditing {
+                            Button {
+                                withAnimation{
+                                    line.isCheck.toggle()
+                                }
+                            } label: {
+                                Image(systemName: line.isCheck ? "checkmark" : "circle")
+                                    .font(.system(size: line.isCheck ? 25 : 40, weight: line.isCheck ? .regular : .ultraLight))
+                                    .foregroundStyle(line.isCheck ? Color.primary : Color.blue)
                             }
-                        } label: {
-                            Image(systemName: line.isCheck ? "checkmark" : "circle")
-                            .font(.system(size: line.isCheck ? 25 : 40, weight: line.isCheck ? .regular : .ultraLight))
-                            .foregroundStyle(line.isCheck ? Color.primary : Color.blue)
+                            .frame(width: 40, height: 40)
+                            .glassEffect(.identity.interactive())
+                            .transition(.opacity.combined(with: .scale))
                         }
-                        .frame(width: 40, height: 40)
-                        .glassEffect(.identity.interactive())
-                        .opacity(isEditing ? 0 : 1)
                         
                         Text(line.name)
                         
