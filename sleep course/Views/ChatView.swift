@@ -76,7 +76,7 @@ struct ChatView: View {
                     }
                 }
             }
-            .background(Color.appBackground)
+            .background(Color("BackgroundColor"))
             .navigationTitle("")
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -278,7 +278,7 @@ struct MessageBubble: View {
                 .background(
                     message.isFromUser
                         ? AnyView(Color(red: 0/255, green: 120/255, blue: 255/255))
-                        : AnyView(Color.messageBubbleEva)
+                        : AnyView(Color("BackgroundColor"))
                 )
                 .clipShape(
                     MessageBubbleShape(

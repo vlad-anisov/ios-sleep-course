@@ -8,6 +8,7 @@ struct RitualView: View {
     @State private var isEditing = false
     @State private var showingAddSheet = false
     @State private var newTask = ""
+    private let customBlue = Color(red: 0/255, green: 120/255, blue: 255/255)
     
     private var lines: [RitualLine] {
         ritual.lines.sorted { $0.sequence < $1.sequence }
@@ -17,28 +18,31 @@ struct RitualView: View {
         NavigationStack {
             List {
                 ForEach(lines) { line in
-                    HStack(spacing: 10) {
-                        if !isEditing {
-                            Button(action: {
+                    HStack(spacing: 15) {
+                        Button {
+                            withAnimation{
                                 line.isCheck.toggle()
-                                try? modelContext.save()
-                            }) {
-                                Circle()
-                                                        .glassEffect(.clear.tint(Color(red: 0/255, green: 30/255, blue: 75/255)).interactive())
-                                                    .frame(width: 40, height: 40)
-//                                Image(systemName: line.isCheck ? "checkmark.circle.fill" : "circle")
-//                                    .foregroundColor(line.isCheck ? .green : .gray)
-//                                    .font(.system(size: 24))
                             }
-                            .buttonStyle(PlainButtonStyle())
+                        } label: {
+                            Image(systemName: line.isCheck ? "checkmark" : "circle")
+                            .font(.system(size: line.isCheck ? 25 : 40, weight: line.isCheck ? .regular : .ultraLight))
+                            .foregroundStyle(line.isCheck ? Color.primary : Color.blue)
                         }
+                        .frame(width: 40, height: 40)
+                        .glassEffect(.identity.interactive())
+                        .opacity(isEditing ? 0 : 1)
                         
                         Text(line.name)
-                            .strikethrough(line.isCheck && !isEditing, color: .gray)
-                            .foregroundColor(line.isCheck && !isEditing ? .gray : .primary)
+                        
                         Spacer()
                     }
                     .padding()
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .background(line.isCheck && !isEditing ? .blue: .clear)
+                    .clipShape(.rect(cornerRadius: 35))
+                    .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40, x: 0, y: 0)
+                    .glassEffect(line.isCheck && !isEditing ? .clear.interactive() : .identity.interactive())
                 }
                 .onMove { from, to in
                     var ordered = lines
@@ -48,10 +52,6 @@ struct RitualView: View {
                 .onDelete {
                     lines[$0.first!].ritual = nil
                 }
-//                .clipShape(.rect(cornerRadius: 35))
-                .glassEffect(.clear.interactive())
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
                 
                 if isEditing {
                     Button("Добавить задачу") {
@@ -60,13 +60,15 @@ struct RitualView: View {
                 }
             }
             .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-//            .background(Color.appBackground)
+//            .scrollContentBackground(.hidden)
+            .background(Color("BackgroundColor"))
             .navigationTitle("Ритуал")
             .scrollIndicators(.hidden)
             .toolbar {
                 Button(isEditing ? "Готово" : "Править") {
-                    isEditing.toggle()
+                    withAnimation{
+                        isEditing.toggle()
+                    }
                 }
             }
             .environment(\.editMode, .constant(isEditing ? .active : .inactive))

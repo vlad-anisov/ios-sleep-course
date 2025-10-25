@@ -8,7 +8,7 @@ struct ArticleView: View {
             Text(article.text).listRowBackground(Color.clear)
         }
         .scrollContentBackground(.hidden)
-        .background(Color.appBackground)
+        .background(Color("BackgroundColor"))
         .navigationTitle(article.name)
     }
 }

@@ -27,8 +27,12 @@ struct ArticlesView: View {
             .listStyle(.plain)
             .scrollIndicators(.hidden)
             .navigationLinkIndicatorVisibility(.hidden)
-            .background(Color.appBackground)
+            .background(Color("BackgroundColor"))
             .navigationTitle("Статьи")
         }
     }
+}
+
+#Preview {
+    ArticlesView()
 }
