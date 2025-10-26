@@ -5,7 +5,8 @@ struct RitualView: View {
     @Bindable var ritual: Ritual
     @Query private var allLines: [RitualLine]
     @Environment(\.modelContext) private var modelContext
-    @State private var isEditing = false
+    @State private var mode: EditMode = .inactive
+    private var isEditing: Bool { mode.isEditing }
     @State private var showingAddSheet = false
     @State private var newTask = ""
     private let customBlue = Color(red: 0/255, green: 120/255, blue: 255/255)
@@ -33,15 +34,13 @@ struct RitualView: View {
                             .glassEffect(.identity.interactive())
                             .transition(.opacity.combined(with: .scale))
                         }
-                        
                         Text(line.name)
-                        
                         Spacer()
                     }
                     .padding()
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    .background(line.isCheck && !isEditing ? .blue: .clear)
+                    .background(line.isCheck && !isEditing ? .blue : .clear)
                     .clipShape(.rect(cornerRadius: 35))
                     .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40, x: 0, y: 0)
                     .glassEffect(line.isCheck && !isEditing ? .clear.interactive() : .identity.interactive())
@@ -54,46 +53,44 @@ struct RitualView: View {
                 .onDelete {
                     lines[$0.first!].ritual = nil
                 }
-                
                 if isEditing {
                     Button("Добавить задачу") {
                         showingAddSheet = true
                     }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 }
             }
             .listStyle(.plain)
-//            .scrollContentBackground(.hidden)
             .background(Color("BackgroundColor"))
             .navigationTitle("Ритуал")
             .scrollIndicators(.hidden)
             .toolbar {
-                Button(isEditing ? "Готово" : "Править") {
-                    withAnimation{
-                        isEditing.toggle()
-                    }
-                }
+                EditButton()
             }
-            .environment(\.editMode, .constant(isEditing ? .active : .inactive))
+            .environment(\.editMode, $mode)
             .sheet(isPresented: $showingAddSheet) {
-                List {
-                    ForEach(allLines.filter{ $0.ritual?.id != ritual.id }){ line in
-                        Button(line.name) {
-                            line.ritual = ritual
-                            showingAddSheet = false
+                NavigationStack{
+                    List {
+                        ForEach(allLines.filter{ $0.ritual?.id != ritual.id }){ line in
+                            Button(line.name) {
+                                line.ritual = ritual
+                                showingAddSheet = false
+                            }
                         }
+                        
+                        TextField("Новая задача", text: $newTask)
+                            .onSubmit {
+                                RitualLine(
+                                    name: newTask,
+                                    ritual: ritual,
+                                )
+                                newTask = ""
+                                showingAddSheet = false
+                            }
                     }
-                    
-                    TextField("Новая задача", text: $newTask)
-                        .onSubmit {
-                            RitualLine(
-                                name: newTask,
-                                ritual: ritual,
-                            )
-                            newTask = ""
-                            showingAddSheet = false
-                        }
+                    .presentationDetents([.medium, .large])
                 }
-                .presentationDetents([.medium, .large])
             }
         }
     }
