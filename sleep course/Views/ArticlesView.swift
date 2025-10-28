@@ -38,9 +38,11 @@ struct ArticlesView: View {
                 ForEach(articles) { article in
                     NavigationLink(destination: ArticleView(article: article)) {
                         HStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading) {
                                 Text(article.shortName ?? "").font(.title3).bold()
-                                Text(article.articleDescription ?? "").font(.callout)
+                                Text(article.articleDescription ?? "")
+                                    .font(.callout)
+                                    .multilineTextAlignment(.leading)
                             }
                             Spacer()
                             Text(article.emoji ?? "").font(.system(size: 70))
@@ -51,15 +53,25 @@ struct ArticlesView: View {
                     .background(RadialGradient(colors: article.gradientColors, center: .bottom, startRadius: 0, endRadius: 200))
                     .clipShape(.rect(cornerRadius: 35))
                     .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 35))
-                    .padding()
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
                 }
-                .background(Color("BackgroundColor"))
-                .navigationTitle("Статьи")
             }
+            .background(Color("BackgroundColor"))
+            .navigationTitle("Статьи")
         }
     }
 }
 
 #Preview {
-    ArticlesView()
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Article.self, configurations: config)
+    
+    // Добавляем моковые статьи в контейнер
+    for article in Article.mockArticles {
+        container.mainContext.insert(article)
+    }
+    
+    return ArticlesView()
+        .modelContainer(container)
 }
