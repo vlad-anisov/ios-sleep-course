@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import ExyteChat
+import Combine
 
 struct ChatView: View {
     @Environment(\.modelContext) private var context
@@ -9,6 +10,10 @@ struct ChatView: View {
     @State private var isTyping = false
     @State private var currentStep: ScriptStep?
     @State private var buttons: [String] = []
+    private let chatAnim = Animation.spring(response: 0.35, dampingFraction: 0.9)
+    private let chatDelay: TimeInterval = 3.0
+    private let typingAppearDelay: TimeInterval = 1.0
+    private let buttonsAppearDelay: TimeInterval = 1.0
     
     private var script: Script? { scripts.first { $0.isMain && $0.state == .running } }
     
@@ -20,52 +25,51 @@ struct ChatView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                ForEach(messages) { message in
-                    HStack {
-                        if message.isFromUser {
-                            Spacer()
-                        }
+                let items = Array(messages)
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, message in
+                    let next = index + 1 < items.count ? items[index + 1] : nil
+                    let nextSameBot = !message.isFromUser && (next?.isFromUser == false)
+
+                    ChatRow(
+                        alignment: message.isFromUser ? .trailing : .leading,
+                        padding: nextSameBot ? 0 : 5
+                    ) {
                         Text(message.body)
+                            .contentTransition(.opacity)
                             .padding()
                             .background(message.isFromUser ? Color.blue : Color("MessageColor"))
                             .clipShape(
                                 .rect(
                                     topLeadingRadius: 35,
-                                    bottomLeadingRadius: message.isFromUser ? 35 : 0,
-                                    bottomTrailingRadius: message.isFromUser ? 0 : 35,
+                                    bottomLeadingRadius: message.isFromUser ? 35 : (nextSameBot ? 35 : 5),
+                                    bottomTrailingRadius: message.isFromUser ? 5 : 35,
                                     topTrailingRadius: 35
                                 )
                             )
-                        if !message.isFromUser {
-                            Spacer()
-                        }
                     }
-                    .padding()
                 }
                 if isTyping {
-                    HStack {
+                    ChatRow(alignment: .leading) {
                         TypingDots()
-                        Spacer()
                     }
-                    .padding()
                 }
-                if !buttons.isEmpty {
-                    ForEach(buttons, id: \.self) { text in
-                        HStack {
-                            Spacer()
-                            Button {
-                                handleUserMessage(text)
-                            } label: {
-                                Text(text).foregroundStyle(.white)
-                            }
-                            .padding()
-                            .glassEffect(.clear.tint(.blue).interactive())
-                            Spacer()
+                ForEach(buttons, id: \.self) { text in
+                    ChatRow(alignment: .center) {
+                        Button {
+                            handleUserMessage(text)
+                        } label: {
+                            Text(text).foregroundStyle(.white)
                         }
                         .padding()
+                        .glassEffect(.clear.tint(.blue).interactive())
                     }
                 }
             }
+            .defaultScrollAnchor(.bottom)
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 5)
+            }
+            .scrollBounceBehavior(.basedOnSize)
             .background(Color("BackgroundColor"))
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -167,12 +171,20 @@ struct ChatView: View {
                 } else {
                     // Есть сообщения - проверяем нужны ли кнопки
                     if step.type == .nextStepName {
-                        buttons = s.steps.filter { step.nextStepIds.contains($0.id) }.map { $0.name }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
+                            withAnimation(chatAnim) {
+                                buttons = s.steps.filter { step.nextStepIds.contains($0.id) }.map { $0.name }
+                            }
+                        }
                     } else if step.type == .mood {
-                        buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
+                        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
+                            withAnimation(chatAnim) {
+                                buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
+                            }
+                        }
                     } else if !step.nextStepIds.isEmpty {
                         // Автопродолжение если нужно
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + chatDelay) {
                             self.currentStep = step
                             self.showStep(step)
                         }
@@ -198,20 +210,30 @@ struct ChatView: View {
         let stepType = step.type
         let message = step.plainMessage
         
-        step.state = .done
-        isTyping = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
+            withAnimation(chatAnim) { isTyping = true }
+        }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.isTyping = false
-            _ = ChatMessage.createMessage(body: message, isFromUser: false, in: self.context)
-            
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
+            withAnimation(chatAnim) {
+                self.isTyping = false
+                _ = ChatMessage.createMessage(body: message, isFromUser: false, in: self.context)
+            }
             // Определяем кнопки
             if stepType == .nextStepName, let s = self.script {
-                self.buttons = s.steps.filter { nextIds.contains($0.id) }.map { $0.name }
+                DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
+                    withAnimation(chatAnim) {
+                        self.buttons = s.steps.filter { nextIds.contains($0.id) }.map { $0.name }
+                    }
+                }
             } else if stepType == .mood {
-                self.buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
+                DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
+                    withAnimation(chatAnim) {
+                        self.buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
+                    }
+                }
             } else {
-                self.buttons = []
+                withAnimation(chatAnim) { self.buttons = [] }
                 // Если нет кнопок, но есть следующий шаг - автоматически продолжаем
                 if !nextIds.isEmpty, let s = self.script, let nextStep = s.steps.first(where: { nextIds.contains($0.id) }) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -224,9 +246,9 @@ struct ChatView: View {
     }
     
     private func handleUserMessage(_ text: String) {
-        _ = ChatMessage.createMessage(body: text, isFromUser: true, in: context)
+        withAnimation(chatAnim) { _ = ChatMessage.createMessage(body: text, isFromUser: true, in: context) }
         if let step = currentStep {
-            buttons = []
+            withAnimation(chatAnim) { buttons = [] }
             moveToNext(from: step, userAnswer: text)
         } else {
             respondToFreeText(text)
@@ -237,8 +259,10 @@ struct ChatView: View {
         let nextIds = step.nextStepIds
         let stepType = step.type
         
-        isTyping = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
+            withAnimation(chatAnim) { isTyping = true }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
             guard let s = self.script else { return }
             
             let next: ScriptStep? = if stepType == .nextStepName, let answer = userAnswer {
@@ -251,17 +275,23 @@ struct ChatView: View {
                 self.currentStep = next
                 self.showStep(next)
             } else {
-                self.isTyping = false
-                _ = ChatMessage.createMessage(body: "Отлично! Мы завершили этот этап. Продолжай изучать материалы в разделе Статьи! 🎉", isFromUser: false, in: self.context)
+                withAnimation(chatAnim) {
+                    self.isTyping = false
+                    _ = ChatMessage.createMessage(body: "Отлично! Мы завершили этот этап. Продолжай изучать материалы в разделе Статьи! 🎉", isFromUser: false, in: self.context)
+                }
             }
         }
     }
     
     private func respondToFreeText(_ msg: String) {
-        isTyping = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            isTyping = false
-            _ = ChatMessage.createMessage(body: ChatMessage.generateEvaResponse(for: msg), isFromUser: false, in: context)
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
+            withAnimation(chatAnim) { isTyping = true }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
+            withAnimation(chatAnim) {
+                isTyping = false
+                _ = ChatMessage.createMessage(body: ChatMessage.generateEvaResponse(for: msg), isFromUser: false, in: context)
+            }
         }
     }
     
@@ -279,19 +309,47 @@ struct ChatView: View {
 }
 
 // MARK: - Components
+
+struct ChatRow<Content: View>: View {
+    let alignment: Alignment
+    let padding: CGFloat
+    @ViewBuilder let content: () -> Content
+
+    init(alignment: Alignment, padding: CGFloat = 5, @ViewBuilder content: @escaping () -> Content) {
+        self.alignment = alignment
+        self.padding = padding
+        self.content = content
+    }
+
+    var body: some View {
+        content()
+            .frame(maxWidth: .infinity, alignment: alignment)
+            .padding(.horizontal, 20)
+            .padding(.bottom, padding)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+}
 struct TypingDots: View {
-    @State private var animate = 0.0
+    @State private var phase = 0
+    private let timer = Timer.publish(every: 0.3, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         HStack(spacing: 4) {
             ForEach(0..<3) { i in
-                Circle().fill(Color.gray.opacity(0.6)).frame(width: 8, height: 8)
-                    .scaleEffect(animate == Double(i) ? 1.2 : 0.8)
-                    .animation(.easeInOut(duration: 0.6).repeatForever().delay(Double(i) * 0.2), value: animate)
+                Circle()
+                    .fill(Color.gray.opacity(0.6))
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(i == phase ? 1.2 : 0.8)
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 18))
-        .onAppear { animate = 1 }
+        .background(Color.gray.opacity(0.2))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .onReceive(timer) { _ in
+            withAnimation(.easeInOut(duration: 0.25)) {
+                phase = (phase + 1) % 3
+            }
+        }
     }
 }
 // Все компоненты теперь встроены через messageBuilder библиотеки Exyte/Chat
