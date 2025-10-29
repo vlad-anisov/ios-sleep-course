@@ -58,6 +58,93 @@ struct ChatView: View {
                     }
                 }
             }
+            .avatarSize(avatarSize: 0)
+            .showMessageMenuOnLongPress(false)
+            .chatTheme(
+                ExyteChat.ChatTheme(
+                    colors: .init(
+                        mainBG: Color("BackgroundColor"),
+                        messageMyBG: .blue,
+                        messageFriendBG: Color("MessageColor"),
+                    )
+                )
+            )
+
+//            } messageBuilder: { message, positionInUserGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
+//                VStack {
+//                    Text(message.text)
+//                }
+//                VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 8) {
+//                    // Сообщение без аватарки
+//                    HStack(spacing: 0) {
+//                        if message.user.isCurrentUser {
+//                            Spacer(minLength: 60)
+//                        }
+//                        
+//                        Text(message.text)
+//                            .padding(.horizontal, 16)
+//                            .padding(.vertical, 10)
+//                            .foregroundColor(message.user.isCurrentUser ? .white : .primary)
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 18)
+//                                    .fill(message.user.isCurrentUser ? Color.blue : Color("MessageColor"))
+//                            )
+//                        
+//                        if !message.user.isCurrentUser {
+//                            Spacer(minLength: 60)
+//                        }
+//                    }
+//                    
+//                    // Кнопки под сообщением бота
+//                    if !message.user.isCurrentUser && !buttons.isEmpty {
+//                        VStack(spacing: 8) {
+//                            ForEach(buttons, id: \.self) { text in
+//                                Button {
+//                                    handleUserMessage(text)
+//                                } label: {
+//                                    Text(text)
+//                                        .foregroundStyle(.blue)
+//                                        .frame(maxWidth: .infinity)
+//                                        .padding(.vertical, 12)
+//                                        .padding(.horizontal, 16)
+//                                        .background(
+//                                            RoundedRectangle(cornerRadius: 12)
+//                                                .stroke(Color.blue, lineWidth: 1)
+//                                        )
+//                                }
+//                            }
+//                        }
+//                        .padding(.horizontal, 16)
+//                    }
+//                }
+//                .padding(.horizontal, 8)
+//                .padding(.vertical, 4)
+//            }
+//            .betweenListAndInputViewBuilder {
+//                // Индикатор печати через API библиотеки
+//                Group {
+//                    if isTyping {
+//                        HStack {
+//                            HStack(spacing: 6) {
+//                                ForEach(0..<3) { i in
+//                                    Circle()
+//                                        .fill(Color.gray.opacity(0.6))
+//                                        .frame(width: 8, height: 8)
+//                                }
+//                            }
+//                            .padding(.horizontal, 16)
+//                            .padding(.vertical, 10)
+//                            .background(
+//                                RoundedRectangle(cornerRadius: 18)
+//                                    .fill(Color("MessageColor"))
+//                            )
+//                            Spacer()
+//                        }
+//                        .padding(.horizontal, 16)
+//                        .padding(.vertical, 8)
+//                    }
+//                }
+//            }
             .background(Color("BackgroundColor"))
             .defaultScrollAnchor(.bottom)
             .toolbar {
