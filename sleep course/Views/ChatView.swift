@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import ExyteChat
 
 struct ChatView: View {
     @Environment(\.modelContext) private var context
@@ -10,6 +11,11 @@ struct ChatView: View {
     @State private var buttons: [String] = []
     
     private var script: Script? { scripts.first { $0.isMain && $0.state == .running } }
+    
+    // Конвертируем наши сообщения в формат ExyteChat
+    private var exyteChatMessages: [ExyteChat.Message] {
+        messages.toExyteChatMessages()
+    }
     
     var body: some View {
         NavigationStack {
@@ -34,13 +40,14 @@ struct ChatView: View {
                             Spacer()
                         }
                     }
-                    .id(message.id)
+                    .padding()
                 }
                 if isTyping {
                     HStack {
                         TypingDots()
                         Spacer()
                     }
+                    .padding()
                 }
                 if !buttons.isEmpty {
                     ForEach(buttons, id: \.self) { text in
@@ -55,98 +62,11 @@ struct ChatView: View {
                             .glassEffect(.clear.tint(.blue).interactive())
                             Spacer()
                         }
+                        .padding()
                     }
                 }
             }
-            .avatarSize(avatarSize: 0)
-            .showMessageMenuOnLongPress(false)
-            .chatTheme(
-                ExyteChat.ChatTheme(
-                    colors: .init(
-                        mainBG: Color("BackgroundColor"),
-                        messageMyBG: .blue,
-                        messageFriendBG: Color("MessageColor"),
-                    )
-                )
-            )
-
-//            } messageBuilder: { message, positionInUserGroup, positionInMessagesSection, positionInCommentsGroup, showContextMenuClosure, messageActionClosure, showAttachmentClosure in
-//                VStack {
-//                    Text(message.text)
-//                }
-//                VStack(alignment: message.user.isCurrentUser ? .trailing : .leading, spacing: 8) {
-//                    // Сообщение без аватарки
-//                    HStack(spacing: 0) {
-//                        if message.user.isCurrentUser {
-//                            Spacer(minLength: 60)
-//                        }
-//                        
-//                        Text(message.text)
-//                            .padding(.horizontal, 16)
-//                            .padding(.vertical, 10)
-//                            .foregroundColor(message.user.isCurrentUser ? .white : .primary)
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 18)
-//                                    .fill(message.user.isCurrentUser ? Color.blue : Color("MessageColor"))
-//                            )
-//                        
-//                        if !message.user.isCurrentUser {
-//                            Spacer(minLength: 60)
-//                        }
-//                    }
-//                    
-//                    // Кнопки под сообщением бота
-//                    if !message.user.isCurrentUser && !buttons.isEmpty {
-//                        VStack(spacing: 8) {
-//                            ForEach(buttons, id: \.self) { text in
-//                                Button {
-//                                    handleUserMessage(text)
-//                                } label: {
-//                                    Text(text)
-//                                        .foregroundStyle(.blue)
-//                                        .frame(maxWidth: .infinity)
-//                                        .padding(.vertical, 12)
-//                                        .padding(.horizontal, 16)
-//                                        .background(
-//                                            RoundedRectangle(cornerRadius: 12)
-//                                                .stroke(Color.blue, lineWidth: 1)
-//                                        )
-//                                }
-//                            }
-//                        }
-//                        .padding(.horizontal, 16)
-//                    }
-//                }
-//                .padding(.horizontal, 8)
-//                .padding(.vertical, 4)
-//            }
-//            .betweenListAndInputViewBuilder {
-//                // Индикатор печати через API библиотеки
-//                Group {
-//                    if isTyping {
-//                        HStack {
-//                            HStack(spacing: 6) {
-//                                ForEach(0..<3) { i in
-//                                    Circle()
-//                                        .fill(Color.gray.opacity(0.6))
-//                                        .frame(width: 8, height: 8)
-//                                }
-//                            }
-//                            .padding(.horizontal, 16)
-//                            .padding(.vertical, 10)
-//                            .background(
-//                                RoundedRectangle(cornerRadius: 18)
-//                                    .fill(Color("MessageColor"))
-//                            )
-//                            Spacer()
-//                        }
-//                        .padding(.horizontal, 16)
-//                        .padding(.vertical, 8)
-//                    }
-//                }
-//            }
             .background(Color("BackgroundColor"))
-            .defaultScrollAnchor(.bottom)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 12) {
@@ -162,6 +82,77 @@ struct ChatView: View {
             }
         }
     }
+    
+//    var body: some View {
+//        NavigationStack {
+//            ExyteChat.ChatView(messages: exyteChatMessages) { draft in
+//
+//            } inputViewBuilder: { textBinding, attachments, inputViewState, inputViewStyle, inputViewActionClosure, dismissKeyboardClosure in
+//                Group {}
+//            }
+//            .avatarSize(avatarSize: 0)
+//            .showMessageMenuOnLongPress(false)
+//            .isListAboveInputView(true)
+//            .showDateHeaders(false)
+////            .betweenListAndInputViewBuilder {
+////                ForEach(buttons, id: \.self) { text in
+////                    HStack {
+////                        Spacer()
+////                        Button {
+////                            handleUserMessage(text)
+////                        } label: {
+////                            Text(text).foregroundStyle(.white)
+////                        }
+////                        .padding()
+////                        .glassEffect(.clear.tint(.blue).interactive())
+////                        Spacer()
+////                    }
+////                }
+////            }
+//            .mainHeaderBuilder {
+//                Text("TEST")
+//            }
+//            .chatTheme(
+//                ExyteChat.ChatTheme(
+//                    colors: .init(
+//                        mainBG: Color("BackgroundColor"),
+//                        messageMyBG: .blue,
+//                        messageFriendBG: Color("MessageColor"),
+//                    )
+//                )
+//            )
+//            .background(Color("BackgroundColor"))
+//            .ignoresSafeArea(.all, edges: .vertical)
+//            .toolbar {
+//                ToolbarItem(placement: .principal) {
+//                    HStack(spacing: 12) {
+//                        Circle().frame(width: 40, height: 40).overlay(Text("E"))
+//                        Text("Ева")
+//                    }
+//                }
+//                ToolbarItem(placement: .topBarTrailing) {
+//                    Button("Сброс") {
+//                        resetChat()
+//                    }
+//                }
+//                ToolbarItem(){
+//                    ForEach(buttons, id: \.self) { text in
+//                        HStack {
+//                            Spacer()
+//                            Button {
+//                                handleUserMessage(text)
+//                            } label: {
+//                                Text(text).foregroundStyle(.white)
+//                            }
+//                            .padding()
+//                            .glassEffect(.clear.tint(.blue).interactive())
+//                            Spacer()
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     
     private func initScript() {
         // Если есть скрипт, восстанавливаем состояние
@@ -203,7 +194,6 @@ struct ChatView: View {
     }
     
     private func showStep(_ step: ScriptStep) {
-        let stepId = step.id
         let nextIds = step.nextStepIds
         let stepType = step.type
         let message = step.plainMessage
@@ -304,52 +294,21 @@ struct TypingDots: View {
         .onAppear { animate = 1 }
     }
 }
-
-struct MessageRow: View {
-    let message: ChatMessage
-    let showAvatar: Bool
-    
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 8) {
-//            if !message.isFromUser {
-//                if showAvatar {
-//                    Circle().fill(LinearGradient(colors: [.blue.opacity(0.8), .purple.opacity(0.8)], startPoint: .topLeading, endPoint: .bottomTrailing))
-//                        .frame(width: 30, height: 30)
-//                        .overlay(Text("E").font(.system(size: 14, weight: .semibold)).foregroundStyle(.white))
-//                } else {
-//                    Color.clear.frame(width: 30, height: 30)
-//                }
-//            }
-            
-            if message.isFromUser { Spacer(minLength: 60) }
-            
-            Text(message.body)
-                .foregroundStyle(message.isFromUser ? .white : .primary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    UnevenRoundedRectangle(cornerRadii: .init(
-                        topLeading: 18,
-                        bottomLeading: message.isFromUser ? 18 : 0,
-                        bottomTrailing: message.isFromUser ? 0 : 18,
-                        topTrailing: 18
-                    ))
-                    .fill(message.isFromUser ? Color.blue : Color.gray)
-                )
-            
-            if !message.isFromUser { Spacer(minLength: 60) }
-        }
-        .padding()
-    }
-}
-
-extension Array where Element == ChatMessage {
-    func before(_ message: ChatMessage) -> ChatMessage? {
-        guard let i = firstIndex(where: { $0.id == message.id }), i > 0 else { return nil }
-        return self[i - 1]
-    }
-}
+// Все компоненты теперь встроены через messageBuilder библиотеки Exyte/Chat
 
 #Preview {
-    ChatView()
+    let container = try! ModelContainer(for: ChatMessage.self, Script.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = container.mainContext
+    
+    // Добавляем тестовые сообщения
+    let msg1 = ChatMessage(id: 1, body: "Привет! Я Ева, твой ассистент по сну.", authorName: "Eva", date: Date().addingTimeInterval(-300), isFromUser: false)
+    let msg2 = ChatMessage(id: 2, body: "Привет! Как начать?", authorName: "User", date: Date().addingTimeInterval(-200), isFromUser: true)
+    let msg3 = ChatMessage(id: 3, body: "Давай начнем с оценки твоего сна. Как ты спал сегодня?", authorName: "Eva", date: Date().addingTimeInterval(-100), isFromUser: false)
+    
+    context.insert(msg1)
+    context.insert(msg2)
+    context.insert(msg3)
+    
+    return ChatView()
+        .modelContainer(container)
 }

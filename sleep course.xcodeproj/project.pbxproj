@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F526EC712EB1528500803719 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = F526EC702EB1528500803719 /* ExyteChat */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F522A44F2EA6F45800B9CE74 /* sleep course.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "sleep course.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F526EC712EB1528500803719 /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "sleep course";
 			packageProductDependencies = (
+				F526EC702EB1528500803719 /* ExyteChat */,
 			);
 			productName = "sleep course";
 			productReference = F522A44F2EA6F45800B9CE74 /* sleep course.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = F522A4462EA6F45800B9CE74;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F526EC6F2EB1528500803719 /* XCRemoteSwiftPackageReference "Chat" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F522A4502EA6F45800B9CE74 /* Products */;
 			projectDirPath = "";
@@ -336,6 +345,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F526EC6F2EB1528500803719 /* XCRemoteSwiftPackageReference "Chat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/Chat.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F526EC702EB1528500803719 /* ExyteChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F526EC6F2EB1528500803719 /* XCRemoteSwiftPackageReference "Chat" */;
+			productName = ExyteChat;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F522A4472EA6F45800B9CE74 /* Project object */;
 }

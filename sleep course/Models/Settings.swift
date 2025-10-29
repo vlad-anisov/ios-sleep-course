@@ -30,7 +30,7 @@ final class Settings {
                                                     content: content,
                                                     trigger: trigger)
                 try await center.add(request)
-                let pending = await center.pendingNotificationRequests()
+                _ = await center.pendingNotificationRequests()
             }
         }
     }
