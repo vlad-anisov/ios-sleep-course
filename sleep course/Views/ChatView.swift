@@ -51,9 +51,7 @@ struct ChatView: View {
                         Button(text) {
                             handleUserMessage(text)
                         }
-                        .foregroundStyle(.white)
-                        .padding()
-                        .glassEffect(.clear.tint(.blue).interactive())
+                        .blueGlassButton()
                     }
                 }
             }
@@ -62,8 +60,9 @@ struct ChatView: View {
                 Color.clear.frame(height: 1)
             }
             .scrollBounceBehavior(.basedOnSize)
-            .background(Color("BackgroundColor"))
-            .scrollIndicators(.hidden)
+            .appScreenStyle("")
+//            .background(Color("BackgroundColor"))
+//            .scrollIndicators(.hidden)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 12) {
@@ -77,9 +76,9 @@ struct ChatView: View {
                     }
                 }
             }
-            .task {
-                initScript()
-            }
+//            .task {
+//                initScript()
+//            }
         }
     }
     
@@ -148,18 +147,15 @@ struct ChatView: View {
     }
     
     private func configureButtons(for step: ScriptStep, in script: Script) {
-        let titles = script.buttonTitles(for: step)
         Task { @MainActor in
             await sleep(buttonsAppearDelay)
-            animate { buttons = titles }
+            animate { buttons = script.buttonTitles(for: step) }
         }
     }
     
     private func scheduleAutoAdvanceIfNeeded(for step: ScriptStep, in script: Script) {
         guard script.shouldAutoAdvance(from: step), let next = script.autoAdvanceTarget(from: step) else {
-            if step.requiresUserInteraction == false {
-                animate { buttons = [] }
-            }
+            if step.requiresUserInteraction == false { animate { buttons = [] } }
             return
         }
         animate { buttons = [] }
@@ -198,16 +194,12 @@ struct ChatView: View {
     }
     
     private func respondToFreeText(_ msg: String) {
-        Task { @MainActor in
-            await respondWithBotMessage(ChatMessage.generateEvaResponse(for: msg))
-        }
+        Task { @MainActor in await respondWithBotMessage(ChatMessage.generateEvaResponse(for: msg)) }
     }
     
     private func resetChat() {
         ChatMessage.resetChat(messages: messages, scripts: scripts, in: context)
-        buttons = []
-        currentStep = nil
-        isTyping = false
+        (buttons, currentStep, isTyping) = ([], nil, false)
         initScript()
     }
 
@@ -215,20 +207,14 @@ struct ChatView: View {
         await sleep(typingAppearDelay)
         animate { isTyping = true }
         await sleep(chatDelay)
-        animate {
-            isTyping = false
-            _ = ChatMessage.createMessage(body: text, isFromUser: false, in: context)
-        }
+        animate { isTyping = false; _ = ChatMessage.createMessage(body: text, isFromUser: false, in: context) }
     }
 
-    @MainActor private func animate(_ action: () -> Void) {
-        withAnimation(chatAnim, action)
-    }
+    @MainActor private func animate(_ action: () -> Void) { withAnimation(chatAnim, action) }
 
     @MainActor private func sleep(_ delay: TimeInterval) async {
         guard delay > 0 else { return }
-        let nanoseconds = UInt64(delay * 1_000_000_000)
-        try? await Task.sleep(nanoseconds: nanoseconds)
+        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
     }
 }
 

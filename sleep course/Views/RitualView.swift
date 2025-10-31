@@ -25,15 +25,9 @@ struct RitualView: View {
                                 ritual.toggleCheck(for: line)
                             }
                         } label: {
-                            if line.isCheck {
-                                Image(systemName: "checkmark")
-                                .font(.system(size: 20, weight: .regular))
-                                .foregroundStyle(Color.primary)
-                            } else {
-                                Image(systemName: "circle")
-                                .font(.system(size: 30, weight: .ultraLight))
-                                .foregroundStyle(Color.blue)
-                            }
+                            Image(systemName: line.isCheck ? "checkmark" : "circle")
+                            .font(line.isCheck ? .system(size: 20, weight: .regular) : .system(size: 30, weight: .ultraLight))
+                            .foregroundStyle(line.isCheck ? .white : .blue)
                         }
                         .frame(width: isEditing ? 0 : 30, height: 30)
                         .glassEffect(.identity.interactive())
@@ -43,12 +37,11 @@ struct RitualView: View {
                         Text(line.name)
                         Spacer()
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
+                    .clearListRow()
                     .background(line.isCheck && !isEditing ? .blue : .clear)
                     .clipShape(.rect(cornerRadius: 31))
                     .glassEffect(line.isCheck && !isEditing ? .clear.interactive() : .identity.interactive(), in: .rect(cornerRadius: 31))
-                    .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40, x: 0, y: 0)
+                    .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40)
                 }
                 .onMove { from, to in
                     ritual.moveLines(fromOffsets: from, toOffset: to)
@@ -56,26 +49,16 @@ struct RitualView: View {
                 .onDelete {
                     ritual.removeLines(at: $0, in: modelContext)
                 }
-                .padding(.horizontal, 5)
                 if isEditing {
-                    Button("Добавить задачу") {
-                        showingAddSheet = true
-                    }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .padding()
-                    .glassEffect(.clear.tint(.blue).interactive())
-                    .frame(maxWidth: .infinity, alignment: .center)
+                    Button("Добавить задачу") { showingAddSheet = true }
+                        .clearListRow()
+                        .blueGlassButton()
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
-            .listStyle(.plain)
-            .background(Color("BackgroundColor"))
-            .navigationTitle("Ритуал")
-            .scrollIndicators(.hidden)
             .toolbar {
                 EditButton()
             }
-            .environment(\.editMode, $mode)
             .sheet(isPresented: $showingAddSheet) {
                 List(ritual.availableLines(from: allLines)) { line in
                     Button(line.name) {
@@ -86,14 +69,13 @@ struct RitualView: View {
                     .foregroundStyle(.white)
                 }
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
                 .presentationDetents([.medium])
                 Button("Создать свою задачу") {
                     createTaskName = ""
                     isPresentingCreateTask = true
                 }
-                .foregroundStyle(.white)
-                .padding()
-                .glassEffect(.clear.tint(.blue).interactive())
+                .blueGlassButton()
                 .alert("Новая задача", isPresented: $isPresentingCreateTask) {
                     TextField("Название", text: $createTaskName)
                         .focused($isCreateTaskFieldFocused)
@@ -107,6 +89,8 @@ struct RitualView: View {
                     Button(role: .close) {}
                 }
             }
+            .environment(\.editMode, $mode)
+            .appScreenStyle("Ритуал")
         }
     }
 }

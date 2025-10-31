@@ -7,6 +7,6 @@ struct ArticleView: View {
         Form {
             Text(article.text).listRowBackground(Color.clear)
         }
-        .appScreenStyle(title: article.name)
+        .appScreenStyle(article.name)
     }
 }

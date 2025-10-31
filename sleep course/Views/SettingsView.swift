@@ -10,7 +10,7 @@ struct SettingsView: View {
                 DatePicker("Время уведомления", selection: $settings.notificationTime, displayedComponents: .hourAndMinute)
                 .listRowBackground(Color("MessageColor"))
             }
-            .appScreenStyle(title: "Настройки")
+            .appScreenStyle("Настройки")
         }
     }
 }
