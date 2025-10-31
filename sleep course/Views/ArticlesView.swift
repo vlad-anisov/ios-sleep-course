@@ -19,8 +19,8 @@ struct ArticlesView: View {
 //                    .padding()
 //                }
 //                .background(RadialGradient(colors: article.gradientColors, center: .bottom, startRadius: 0, endRadius: 200))
-//                .clipShape(.rect(cornerRadius: 35))
-//                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 35))
+//                .clipShape(.rect(cornerRadius: 31))
+//                .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 31))
 //                .listRowBackground(Color.clear)
 //                .listRowSeparator(.hidden)
 //            }
@@ -51,14 +51,15 @@ struct ArticlesView: View {
                         .foregroundStyle(.white)
                     }
                     .background(RadialGradient(colors: article.gradientColors, center: .bottom, startRadius: 0, endRadius: 200))
-                    .clipShape(.rect(cornerRadius: 35))
-                    .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 35))
+                    .clipShape(.rect(cornerRadius: 31))
+                    .glassEffect(.clear.interactive(), in: .rect(cornerRadius: 31))
                     .padding(.vertical, 10)
                     .padding(.horizontal, 20)
                 }
             }
             .background(Color("BackgroundColor"))
             .navigationTitle("Статьи")
+            .scrollIndicators(.hidden)
         }
     }
 }

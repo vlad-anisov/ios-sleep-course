@@ -8,9 +8,9 @@ struct RitualView: View {
     @State private var mode: EditMode = .inactive
     private var isEditing: Bool { mode.isEditing }
     @State private var showingAddSheet = false
-    @State private var newTask = ""
-    private let customBlue = Color(red: 0/255, green: 120/255, blue: 255/255)
-    
+    @State private var isPresentingCreateTask = false
+    @State private var createTaskName = ""
+    @FocusState private var isCreateTaskFieldFocused: Bool
     private var lines: [RitualLine] {
         ritual.lines.sorted { $0.sequence < $1.sequence }
     }
@@ -20,30 +20,35 @@ struct RitualView: View {
             List {
                 ForEach(lines) { line in
                     HStack(spacing: 15) {
-                        if !isEditing {
-                            Button {
-                                withAnimation{
-                                    line.isCheck.toggle()
-                                }
-                            } label: {
-                                Image(systemName: line.isCheck ? "checkmark" : "circle")
-                                    .font(.system(size: line.isCheck ? 25 : 40, weight: line.isCheck ? .regular : .ultraLight))
-                                    .foregroundStyle(line.isCheck ? Color.primary : Color.blue)
+                        Button {
+                            withAnimation {
+                                line.isCheck.toggle()
                             }
-                            .frame(width: 40, height: 40)
-                            .glassEffect(.identity.interactive())
-                            .transition(.opacity.combined(with: .scale))
+                        } label: {
+                            if line.isCheck {
+                                Image(systemName: "checkmark")
+                                .font(.system(size: 20, weight: .regular))
+                                .foregroundStyle(Color.primary)
+                            } else {
+                                Image(systemName: "circle")
+                                .font(.system(size: 30, weight: .ultraLight))
+                                .foregroundStyle(Color.blue)
+                            }
                         }
+                        .frame(width: isEditing ? 0 : 30, height: 30)
+                        .glassEffect(.identity.interactive())
+                        .padding(.horizontal, isEditing ? 11 : 16)
+                        .padding(.vertical, 16)
+                        .opacity(isEditing ? 0 : 1)
                         Text(line.name)
                         Spacer()
                     }
-                    .padding()
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                     .background(line.isCheck && !isEditing ? .blue : .clear)
-                    .clipShape(.rect(cornerRadius: 35))
+                    .clipShape(.rect(cornerRadius: 31))
+                    .glassEffect(line.isCheck && !isEditing ? .clear.interactive() : .identity.interactive(), in: .rect(cornerRadius: 31))
                     .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40, x: 0, y: 0)
-                    .glassEffect(line.isCheck && !isEditing ? .clear.interactive() : .identity.interactive())
                 }
                 .onMove { from, to in
                     var ordered = lines
@@ -53,12 +58,16 @@ struct RitualView: View {
                 .onDelete {
                     lines[$0.first!].ritual = nil
                 }
+                .padding(.horizontal, 5)
                 if isEditing {
                     Button("Добавить задачу") {
                         showingAddSheet = true
                     }
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    .padding()
+                    .glassEffect(.clear.tint(.blue).interactive())
+                    .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
             .listStyle(.plain)
@@ -70,26 +79,36 @@ struct RitualView: View {
             }
             .environment(\.editMode, $mode)
             .sheet(isPresented: $showingAddSheet) {
-                NavigationStack{
-                    List {
-                        ForEach(allLines.filter{ $0.ritual?.id != ritual.id }){ line in
-                            Button(line.name) {
-                                line.ritual = ritual
-                                showingAddSheet = false
-                            }
-                        }
-                        
-                        TextField("Новая задача", text: $newTask)
-                            .onSubmit {
-                                RitualLine(
-                                    name: newTask,
-                                    ritual: ritual,
-                                )
-                                newTask = ""
-                                showingAddSheet = false
-                            }
+                List(allLines.filter { $0.ritual?.id != ritual.id }) { line in
+                    Button(line.name) {
+                        line.ritual = ritual
+                        showingAddSheet = false
                     }
-                    .presentationDetents([.medium, .large])
+                    .listRowBackground(Color("MessageColor"))
+                    .foregroundStyle(.white)
+                }
+                .scrollContentBackground(.hidden)
+                .presentationDetents([.medium])
+                Button("Создать свою задачу") {
+                    createTaskName = ""
+                    isPresentingCreateTask = true
+                }
+                .foregroundStyle(.white)
+                .padding()
+                .glassEffect(.clear.tint(.blue).interactive())
+                .alert("Новая задача", isPresented: $isPresentingCreateTask) {
+                    TextField("Название", text: $createTaskName)
+                        .focused($isCreateTaskFieldFocused)
+                        .onAppear {
+                            isCreateTaskFieldFocused = true
+                        }
+                    Button(role: .confirm) {
+                        let sequence = (ritual.lines.map(\.sequence).max() ?? -1) + 1
+                        let line = RitualLine(name: createTaskName, ritual: ritual)
+                        line.sequence = sequence
+                        showingAddSheet = false
+                    }
+                    Button(role: .close) {}
                 }
             }
         }

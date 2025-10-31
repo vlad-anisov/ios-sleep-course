@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import ExyteChat
 import Combine
 
 struct ChatView: View {
@@ -16,11 +15,6 @@ struct ChatView: View {
     private let buttonsAppearDelay: TimeInterval = 1.0
     
     private var script: Script? { scripts.first { $0.isMain && $0.state == .running } }
-    
-    // Конвертируем наши сообщения в формат ExyteChat
-    private var exyteChatMessages: [ExyteChat.Message] {
-        messages.toExyteChatMessages()
-    }
     
     var body: some View {
         NavigationStack {
@@ -40,10 +34,10 @@ struct ChatView: View {
                             .background(message.isFromUser ? Color.blue : Color("MessageColor"))
                             .clipShape(
                                 .rect(
-                                    topLeadingRadius: 35,
-                                    bottomLeadingRadius: message.isFromUser ? 35 : (nextSameBot ? 35 : 5),
-                                    bottomTrailingRadius: message.isFromUser ? 5 : 35,
-                                    topTrailingRadius: 35
+                                    topLeadingRadius: 31,
+                                    bottomLeadingRadius: message.isFromUser ? 31 : (nextSameBot ? 31 : 5),
+                                    bottomTrailingRadius: message.isFromUser ? 5 : 31,
+                                    topTrailingRadius: 31
                                 )
                             )
                     }
@@ -67,10 +61,11 @@ struct ChatView: View {
             }
             .defaultScrollAnchor(.bottom)
             .safeAreaInset(edge: .bottom) {
-                Color.clear.frame(height: 5)
+                Color.clear.frame(height: 1)
             }
             .scrollBounceBehavior(.basedOnSize)
             .background(Color("BackgroundColor"))
+            .scrollIndicators(.hidden)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     HStack(spacing: 12) {
@@ -82,6 +77,50 @@ struct ChatView: View {
                     Button("Сброс") {
                         resetChat()
                     }
+                }
+            }
+        }
+    }
+    
+    private struct ChatRow<Content: View>: View {
+        let alignment: Alignment
+        let padding: CGFloat
+        @ViewBuilder let content: () -> Content
+
+        init(alignment: Alignment, padding: CGFloat = 5, @ViewBuilder content: @escaping () -> Content) {
+            self.alignment = alignment
+            self.padding = padding
+            self.content = content
+        }
+
+        var body: some View {
+            content()
+                .frame(maxWidth: .infinity, alignment: alignment)
+                .padding(.horizontal, 20)
+                .padding(.bottom, padding)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+
+    private struct TypingDots: View {
+        @State private var phase = 0
+        private let timer = Timer.publish(every: 0.3, on: .main, in: .common).autoconnect()
+
+        var body: some View {
+            HStack(spacing: 4) {
+                ForEach(0..<3) { i in
+                    Circle()
+                        .fill(Color.gray.opacity(0.6))
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(i == phase ? 1.2 : 0.8)
+                }
+            }
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .onReceive(timer) { _ in
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    phase = (phase + 1) % 3
                 }
             }
         }
@@ -236,52 +275,6 @@ struct ChatView: View {
         initScript()
     }
 }
-
-// MARK: - Components
-
-struct ChatRow<Content: View>: View {
-    let alignment: Alignment
-    let padding: CGFloat
-    @ViewBuilder let content: () -> Content
-
-    init(alignment: Alignment, padding: CGFloat = 5, @ViewBuilder content: @escaping () -> Content) {
-        self.alignment = alignment
-        self.padding = padding
-        self.content = content
-    }
-
-    var body: some View {
-        content()
-            .frame(maxWidth: .infinity, alignment: alignment)
-            .padding(.horizontal, 20)
-            .padding(.bottom, padding)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-    }
-}
-struct TypingDots: View {
-    @State private var phase = 0
-    private let timer = Timer.publish(every: 0.3, on: .main, in: .common).autoconnect()
-    
-    var body: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<3) { i in
-                Circle()
-                    .fill(Color.gray.opacity(0.6))
-                    .frame(width: 8, height: 8)
-                    .scaleEffect(i == phase ? 1.2 : 0.8)
-            }
-        }
-        .padding()
-        .background(Color.gray.opacity(0.2))
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .onReceive(timer) { _ in
-            withAnimation(.easeInOut(duration: 0.25)) {
-                phase = (phase + 1) % 3
-            }
-        }
-    }
-}
-// Все компоненты теперь встроены через messageBuilder библиотеки Exyte/Chat
 
 #Preview {
     let container = try! ModelContainer(for: ChatMessage.self, Script.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))

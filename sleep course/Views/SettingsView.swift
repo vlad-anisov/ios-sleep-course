@@ -8,6 +8,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 DatePicker("Время уведомления", selection: $settings.notificationTime, displayedComponents: .hourAndMinute)
+                .listRowBackground(Color("MessageColor"))
             }
             .scrollContentBackground(.hidden)
             .background(Color("BackgroundColor"))
