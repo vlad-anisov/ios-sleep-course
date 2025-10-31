@@ -21,8 +21,7 @@ struct ChatView: View {
             ScrollView {
                 let items = Array(messages)
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, message in
-                    let next = index + 1 < items.count ? items[index + 1] : nil
-                    let nextSameBot = !message.isFromUser && (next?.isFromUser == false)
+                    let nextSameBot = !message.isFromUser && (index + 1 < items.count && !items[index + 1].isFromUser)
 
                     ChatRow(
                         alignment: message.isFromUser ? .trailing : .leading,
@@ -49,11 +48,10 @@ struct ChatView: View {
                 }
                 ForEach(buttons, id: \.self) { text in
                     ChatRow(alignment: .center) {
-                        Button {
+                        Button(text) {
                             handleUserMessage(text)
-                        } label: {
-                            Text(text).foregroundStyle(.white)
                         }
+                        .foregroundStyle(.white)
                         .padding()
                         .glassEffect(.clear.tint(.blue).interactive())
                     }
@@ -142,15 +140,8 @@ struct ChatView: View {
     }
     
     private func showStep(_ step: ScriptStep, in script: Script) {
-        let message = step.plainMessage
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
-            withAnimation(chatAnim) { isTyping = true }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
-            withAnimation(chatAnim) {
-                self.isTyping = false
-                _ = ChatMessage.createMessage(body: message, isFromUser: false, in: self.context)
-            }
+        Task { @MainActor in
+            await respondWithBotMessage(step.plainMessage)
             configureButtons(for: step, in: script)
             scheduleAutoAdvanceIfNeeded(for: step, in: script)
         }
@@ -158,63 +149,57 @@ struct ChatView: View {
     
     private func configureButtons(for step: ScriptStep, in script: Script) {
         let titles = script.buttonTitles(for: step)
-        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
-            withAnimation(chatAnim) {
-                self.buttons = titles
-            }
+        Task { @MainActor in
+            await sleep(buttonsAppearDelay)
+            animate { buttons = titles }
         }
     }
     
     private func scheduleAutoAdvanceIfNeeded(for step: ScriptStep, in script: Script) {
         guard script.shouldAutoAdvance(from: step), let next = script.autoAdvanceTarget(from: step) else {
             if step.requiresUserInteraction == false {
-                withAnimation(chatAnim) { buttons = [] }
+                animate { buttons = [] }
             }
             return
         }
-        withAnimation(chatAnim) { buttons = [] }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.currentStep = next
-            self.showStep(next, in: script)
+        animate { buttons = [] }
+        Task { @MainActor in
+            await sleep(0.5)
+            currentStep = next
+            showStep(next, in: script)
         }
     }
     
     private func handleUserMessage(_ text: String) {
-        withAnimation(chatAnim) { _ = ChatMessage.createMessage(body: text, isFromUser: true, in: context) }
+        animate { _ = ChatMessage.createMessage(body: text, isFromUser: true, in: context) }
         guard let step = currentStep, let script else {
             respondToFreeText(text)
             return
         }
-        withAnimation(chatAnim) { buttons = [] }
+        animate { buttons = [] }
         moveToNext(from: step, in: script, userAnswer: text)
     }
     
     private func moveToNext(from step: ScriptStep, in script: Script, userAnswer: String?) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
-            withAnimation(chatAnim) { isTyping = true }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
+        Task { @MainActor in
+            await sleep(typingAppearDelay)
+            animate { isTyping = true }
+            await sleep(chatDelay)
             guard let next = script.nextStep(from: step, userAnswer: userAnswer) else {
-                withAnimation(chatAnim) {
-                    self.isTyping = false
-                    _ = ChatMessage.createMessage(body: "Отлично! Мы завершили этот этап. Продолжай изучать материалы в разделе Статьи! 🎉", isFromUser: false, in: self.context)
+                animate {
+                    isTyping = false
+                    _ = ChatMessage.createMessage(body: "Отлично! Мы завершили этот этап. Продолжай изучать материалы в разделе Статьи! 🎉", isFromUser: false, in: context)
                 }
                 return
             }
-            self.currentStep = next
-            self.showStep(next, in: script)
+            currentStep = next
+            showStep(next, in: script)
         }
     }
     
     private func respondToFreeText(_ msg: String) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
-            withAnimation(chatAnim) { isTyping = true }
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
-            withAnimation(chatAnim) {
-                isTyping = false
-                _ = ChatMessage.createMessage(body: ChatMessage.generateEvaResponse(for: msg), isFromUser: false, in: context)
-            }
+        Task { @MainActor in
+            await respondWithBotMessage(ChatMessage.generateEvaResponse(for: msg))
         }
     }
     
@@ -224,6 +209,26 @@ struct ChatView: View {
         currentStep = nil
         isTyping = false
         initScript()
+    }
+
+    @MainActor private func respondWithBotMessage(_ text: String) async {
+        await sleep(typingAppearDelay)
+        animate { isTyping = true }
+        await sleep(chatDelay)
+        animate {
+            isTyping = false
+            _ = ChatMessage.createMessage(body: text, isFromUser: false, in: context)
+        }
+    }
+
+    @MainActor private func animate(_ action: () -> Void) {
+        withAnimation(chatAnim, action)
+    }
+
+    @MainActor private func sleep(_ delay: TimeInterval) async {
+        guard delay > 0 else { return }
+        let nanoseconds = UInt64(delay * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: nanoseconds)
     }
 }
 

@@ -4,6 +4,8 @@ import SwiftData
 struct MainTabView: View {
     @Query private var allSettings: [Settings]
     @Query private var allRituals: [Ritual]
+    private var primarySettings: Settings? { Settings.primary(from: allSettings) }
+    private var primaryRitual: Ritual? { Ritual.primaryRitual(from: allRituals) }
 
     var body: some View {
         TabView {
@@ -14,12 +16,12 @@ struct MainTabView: View {
                 ArticlesView()
             }
             Tab("Ритуал", systemImage: "checkmark.circle"){
-                if let ritual = Ritual.primaryRitual(from: allRituals) {
+                if let ritual = primaryRitual {
                     RitualView(ritual: ritual)
                 }
             }
             Tab("Настройки", systemImage: "gear"){
-                if let settings = Settings.primary(from: allSettings) {
+                if let settings = primarySettings {
                     SettingsView(settings: settings)
                 }
             }

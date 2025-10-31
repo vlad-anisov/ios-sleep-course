@@ -7,8 +7,6 @@ struct ArticleView: View {
         Form {
             Text(article.text).listRowBackground(Color.clear)
         }
-        .scrollContentBackground(.hidden)
-        .background(Color("BackgroundColor"))
-        .navigationTitle(article.name)
+        .appScreenStyle(title: article.name)
     }
 }

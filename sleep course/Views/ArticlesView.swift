@@ -40,9 +40,7 @@ struct ArticlesView: View {
                         HStack(spacing: 0) {
                             VStack(alignment: .leading) {
                                 Text(article.shortName ?? "").font(.title3).bold()
-                                Text(article.articleDescription ?? "")
-                                    .font(.callout)
-                                    .multilineTextAlignment(.leading)
+                                Text(article.articleDescription ?? "").font(.callout).multilineTextAlignment(.leading)
                             }
                             Spacer()
                             Text(article.emoji ?? "").font(.system(size: 70))
@@ -57,9 +55,7 @@ struct ArticlesView: View {
                     .padding(.horizontal, 20)
                 }
             }
-            .background(Color("BackgroundColor"))
-            .navigationTitle("Статьи")
-            .scrollIndicators(.hidden)
+            .appScreenStyle(title: "Статьи")
         }
     }
 }
