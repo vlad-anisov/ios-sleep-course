@@ -14,7 +14,7 @@ struct ChatView: View {
     private let typingAppearDelay: TimeInterval = 1.0
     private let buttonsAppearDelay: TimeInterval = 1.0
     
-    private var script: Script? { scripts.first { $0.isMain && $0.state == .running } }
+    private var script: Script? { Script.mainRunningScript(in: scripts) }
     
     var body: some View {
         NavigationStack {
@@ -79,6 +79,9 @@ struct ChatView: View {
                     }
                 }
             }
+            .task {
+                initScript()
+            }
         }
     }
     
@@ -127,127 +130,79 @@ struct ChatView: View {
     }
     
     private func initScript() {
-        // Если есть скрипт, восстанавливаем состояние
-        if let s = script {
-            // Находим последний незавершённый шаг
-            let sortedSteps = s.steps.sorted { $0.sequence < $1.sequence }
-            if let step = sortedSteps.first(where: { $0.state != .done }) {
-                currentStep = step
-                // Если нет сообщений - начинаем показывать
-                if messages.isEmpty {
-                    showStep(step)
-                } else {
-                    // Есть сообщения - проверяем нужны ли кнопки
-                    if step.type == .nextStepName {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
-                            withAnimation(chatAnim) {
-                                buttons = s.steps.filter { step.nextStepIds.contains($0.id) }.map { $0.name }
-                            }
-                        }
-                    } else if step.type == .mood {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
-                            withAnimation(chatAnim) {
-                                buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
-                            }
-                        }
-                    } else if !step.nextStepIds.isEmpty {
-                        // Автопродолжение если нужно
-                        DispatchQueue.main.asyncAfter(deadline: .now() + chatDelay) {
-                            self.currentStep = step
-                            self.showStep(step)
-                        }
-                    }
-                }
-            }
-            return
-        }
-        
-        // Создаём новый скрипт только если нет вообще ничего
-        guard messages.isEmpty else { return }
-        let s = Script.createStartScript(in: context)
-        context.insert(s)
-        try? context.save()
-        if let step = s.steps.sorted(by: { $0.sequence < $1.sequence }).first(where: { $0.state != .done }) {
-            currentStep = step
-            showStep(step)
+        let script = Script.ensureMainScript(in: context, scripts: scripts, messages: messages)
+        guard let step = script.nextPendingStep else { return }
+        currentStep = step
+        if messages.isEmpty {
+            showStep(step, in: script)
+        } else {
+            configureButtons(for: step, in: script)
+            scheduleAutoAdvanceIfNeeded(for: step, in: script)
         }
     }
     
-    private func showStep(_ step: ScriptStep) {
-        let nextIds = step.nextStepIds
-        let stepType = step.type
+    private func showStep(_ step: ScriptStep, in script: Script) {
         let message = step.plainMessage
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
             withAnimation(chatAnim) { isTyping = true }
         }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
             withAnimation(chatAnim) {
                 self.isTyping = false
                 _ = ChatMessage.createMessage(body: message, isFromUser: false, in: self.context)
             }
-            // Определяем кнопки
-            if stepType == .nextStepName, let s = self.script {
-                DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
-                    withAnimation(chatAnim) {
-                        self.buttons = s.steps.filter { nextIds.contains($0.id) }.map { $0.name }
-                    }
-                }
-            } else if stepType == .mood {
-                DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
-                    withAnimation(chatAnim) {
-                        self.buttons = ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
-                    }
-                }
-            } else {
-                withAnimation(chatAnim) { self.buttons = [] }
-                // Если нет кнопок, но есть следующий шаг - автоматически продолжаем
-                if !nextIds.isEmpty, let s = self.script, let nextStep = s.steps.first(where: { nextIds.contains($0.id) }) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.currentStep = nextStep
-                        self.showStep(nextStep)
-                    }
-                }
+            configureButtons(for: step, in: script)
+            scheduleAutoAdvanceIfNeeded(for: step, in: script)
+        }
+    }
+    
+    private func configureButtons(for step: ScriptStep, in script: Script) {
+        let titles = script.buttonTitles(for: step)
+        DispatchQueue.main.asyncAfter(deadline: .now() + buttonsAppearDelay) {
+            withAnimation(chatAnim) {
+                self.buttons = titles
             }
+        }
+    }
+    
+    private func scheduleAutoAdvanceIfNeeded(for step: ScriptStep, in script: Script) {
+        guard script.shouldAutoAdvance(from: step), let next = script.autoAdvanceTarget(from: step) else {
+            if step.requiresUserInteraction == false {
+                withAnimation(chatAnim) { buttons = [] }
+            }
+            return
+        }
+        withAnimation(chatAnim) { buttons = [] }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.currentStep = next
+            self.showStep(next, in: script)
         }
     }
     
     private func handleUserMessage(_ text: String) {
         withAnimation(chatAnim) { _ = ChatMessage.createMessage(body: text, isFromUser: true, in: context) }
-        if let step = currentStep {
-            withAnimation(chatAnim) { buttons = [] }
-            moveToNext(from: step, userAnswer: text)
-        } else {
+        guard let step = currentStep, let script else {
             respondToFreeText(text)
+            return
         }
+        withAnimation(chatAnim) { buttons = [] }
+        moveToNext(from: step, in: script, userAnswer: text)
     }
     
-    private func moveToNext(from step: ScriptStep, userAnswer: String?) {
-        let nextIds = step.nextStepIds
-        let stepType = step.type
-        
+    private func moveToNext(from step: ScriptStep, in script: Script, userAnswer: String?) {
         DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay) {
             withAnimation(chatAnim) { isTyping = true }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + typingAppearDelay + chatDelay) {
-            guard let s = self.script else { return }
-            
-            let next: ScriptStep? = if stepType == .nextStepName, let answer = userAnswer {
-                s.steps.first { nextIds.contains($0.id) && $0.name == answer }
-            } else {
-                s.steps.first { nextIds.contains($0.id) }
-            }
-            
-            if let next {
-                self.currentStep = next
-                self.showStep(next)
-            } else {
+            guard let next = script.nextStep(from: step, userAnswer: userAnswer) else {
                 withAnimation(chatAnim) {
                     self.isTyping = false
                     _ = ChatMessage.createMessage(body: "Отлично! Мы завершили этот этап. Продолжай изучать материалы в разделе Статьи! 🎉", isFromUser: false, in: self.context)
                 }
+                return
             }
+            self.currentStep = next
+            self.showStep(next, in: script)
         }
     }
     
@@ -264,14 +219,10 @@ struct ChatView: View {
     }
     
     private func resetChat() {
-        messages.forEach { context.delete($0) }
-        scripts.forEach { context.delete($0) }
-        try? context.save()
-        
+        ChatMessage.resetChat(messages: messages, scripts: scripts, in: context)
         buttons = []
         currentStep = nil
         isTyping = false
-        
         initScript()
     }
 }

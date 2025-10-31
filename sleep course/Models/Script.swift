@@ -48,74 +48,74 @@ final class Script {
             return .notRunning
         }
     }
-}
-
-@Model
-final class ScriptStep {
-    @Attribute(.unique) var id: Int
-    var name: String
-    var message: String // HTML message
-    var sequence: Int
-    var stateValue: String
-    var typeValue: String
-    var nextStepIds: [Int]
-    var userAnswer: String?
-    var code: String?
     
-    var script: Script?
-    
-    init(id: Int, name: String, message: String, sequence: Int, state: StepState, type: StepType, nextStepIds: [Int], userAnswer: String? = nil, code: String? = nil, script: Script? = nil) {
-        self.id = id
-        self.name = name
-        self.message = message
-        self.sequence = sequence
-        self.stateValue = state.rawValue
-        self.typeValue = type.rawValue
-        self.nextStepIds = nextStepIds
-        self.userAnswer = userAnswer
-        self.code = code
-        self.script = script
+    var sortedSteps: [ScriptStep] {
+        steps.sorted { $0.sequence < $1.sequence }
     }
     
-    var state: StepState {
-        get { StepState(rawValue: stateValue) ?? .notRunning }
-        set { stateValue = newValue.rawValue }
+    var nextPendingStep: ScriptStep? {
+        sortedSteps.first { $0.state != .done }
     }
     
-    var type: StepType {
-        get { StepType(rawValue: typeValue) ?? .nothing }
-        set { typeValue = newValue.rawValue }
+    func buttonTitles(for step: ScriptStep) -> [String] {
+        switch step.type {
+        case .nextStepName:
+            return sortedSteps
+                .filter { step.nextStepIds.contains($0.id) }
+                .map { $0.name }
+        case .mood:
+            return ["Отлично 👍", "Нормально 👌", "Не очень 👎"]
+        default:
+            return []
+        }
     }
     
-    enum StepState: String, Codable {
-        case notRunning = "not_running"
-        case preProcessing = "pre_processing"
-        case waiting = "waiting"
-        case postProcessing = "post_processing"
-        case done = "done"
-        case failed = "failed"
+    func nextStep(from step: ScriptStep, userAnswer: String?) -> ScriptStep? {
+        switch step.type {
+        case .nextStepName:
+            guard let answer = userAnswer else { return nil }
+            return sortedSteps.first {
+                step.nextStepIds.contains($0.id) && $0.name == answer
+            }
+        default:
+            return sortedSteps.first { step.nextStepIds.contains($0.id) }
+        }
     }
     
-    enum StepType: String, Codable {
-        case nothing = "nothing"
-        case nextStepName = "next_step_name"
-        case email = "email"
-        case time = "time"
-        case article = "article"
-        case mood = "mood"
-        case ritualLine = "ritual_line"
-        case ritual = "ritual"
-        case push = "push"
+    func shouldAutoAdvance(from step: ScriptStep) -> Bool {
+        !buttonTitles(for: step).isEmpty ? false : !step.nextStepIds.isEmpty
     }
     
-    // Parse HTML to plain text for display
-    var plainMessage: String {
-        message.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+    func autoAdvanceTarget(from step: ScriptStep) -> ScriptStep? {
+        sortedSteps.first { step.nextStepIds.contains($0.id) }
     }
-}
-
-// Mock scripts data based on PostgreSQL
-extension Script {
+    
+    static func mainRunningScript(in scripts: [Script]) -> Script? {
+        scripts.first { $0.isMain && $0.state == .running }
+    }
+    
+    @MainActor
+    static func ensureMainScript(in context: ModelContext, scripts: [Script], messages: [ChatMessage]) -> Script {
+        if let existing = mainRunningScript(in: scripts) {
+            return existing
+        }
+        if let firstMain = scripts.first(where: { $0.isMain }) {
+            if messages.isEmpty {
+                firstMain.state = .running
+                try? context.save()
+            }
+            return firstMain
+        }
+        if let anyScript = scripts.first {
+            return anyScript
+        }
+        let script = createStartScript(in: context)
+        context.insert(script)
+        try? context.save()
+        return script
+    }
+    
+    // Mock scripts data based on PostgreSQL
     @MainActor
     static func createStartScript(in context: ModelContext) -> Script {
         let script = Script(
@@ -126,7 +126,7 @@ extension Script {
             nextScriptId: 239
         )
         
-        let steps: [(id: Int, name: String, message: String, sequence: Int, state: ScriptStep.StepState, type: ScriptStep.StepType, nextStepIds: [Int])] = [
+        let stepsData: [(id: Int, name: String, message: String, sequence: Int, state: ScriptStep.StepState, type: ScriptStep.StepType, nextStepIds: [Int])] = [
             (1, "Привет 👋", "<p>Привет 👋</p>", 0, .done, .nextStepName, [10]),
             (10, "Привет, а кто ты 🙂", "<p>Меня зовут Ева, и я являюсь лучшим специалистом в области сна 😌</p>", 9, .done, .nothing, [7234]),
             (7234, "О тебе", "<p>Я помогаю людям мягко засыпать, легче пробуждаться по утрам, побеждать дневную сонливость и чувствовать себя более энергичными ✨</p>", 10, .notRunning, .nothing, [7235]),
@@ -139,15 +139,15 @@ extension Script {
             (17, "Поехали 🧑‍🚀", "<p>Во мне собраны сотни исследований о сне, поэтому я могу легко назвать эффективные методы и развеять все мифы. Но это не гарантирует результата 😔</p>", 19, .notRunning, .nothing, [])
         ]
         
-        script.steps = steps.map { stepData in
+        script.steps = stepsData.map { data in
             ScriptStep(
-                id: stepData.id,
-                name: stepData.name,
-                message: stepData.message,
-                sequence: stepData.sequence,
-                state: stepData.state,
-                type: stepData.type,
-                nextStepIds: stepData.nextStepIds,
+                id: data.id,
+                name: data.name,
+                message: data.message,
+                sequence: data.sequence,
+                state: data.state,
+                type: data.type,
+                nextStepIds: data.nextStepIds,
                 script: script
             )
         }

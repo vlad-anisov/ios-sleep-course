@@ -48,10 +48,8 @@ final class Article {
             opacity: components.count > 3 ? components[3] : 1.0
         )
     }
-}
-
-// Mock data for development (ALL 15 articles available to admin from PostgreSQL)
-extension Article {
+    
+    // Mock data for development (ALL 15 articles available to admin from PostgreSQL)
     static let mockArticles: [Article] = [
         Article(
             id: 41,

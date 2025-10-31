@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import ExyteChat
 
 @Model
 final class ChatMessage {
@@ -22,10 +23,8 @@ final class ChatMessage {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
-}
-
-// Chat business logic
-extension ChatMessage {
+    
+    // Chat business logic
     @MainActor
     static func createMessage(body: String, isFromUser: Bool, in context: ModelContext) -> ChatMessage {
         let descriptor = FetchDescriptor<ChatMessage>()
@@ -63,10 +62,40 @@ extension ChatMessage {
             return "Я получила твоё сообщение. Чем могу помочь сегодня в улучшении твоего сна?"
         }
     }
-}
-
-// Mock data for development
-extension ChatMessage {
+    
+    @MainActor
+    static func resetChat(messages: [ChatMessage], scripts: [Script], in context: ModelContext) {
+        messages.forEach { context.delete($0) }
+        scripts.forEach { context.delete($0) }
+        try? context.save()
+    }
+    
+    func toExyteChatMessage() -> ExyteChat.Message {
+        let user = ExyteChat.User(
+            id: isFromUser ? "user" : "eva",
+            name: authorName,
+            avatarURL: nil,
+            isCurrentUser: isFromUser
+        )
+        
+        return ExyteChat.Message(
+            id: String(id),
+            user: user,
+            status: .sent,
+            createdAt: date,
+            text: body,
+            attachments: [],
+            recording: nil,
+            replyMessage: nil
+        )
+    }
+    
+    @MainActor
+    static func fromDraft(_ draft: ExyteChat.DraftMessage, isFromUser: Bool, in context: ModelContext) -> ChatMessage {
+        createMessage(body: draft.text, isFromUser: isFromUser, in: context)
+    }
+    
+    // Mock data for development
     static let mockMessages: [ChatMessage] = [
         ChatMessage(id: 1, body: "Hello! I'm Eva, your sleep assistant. How are you feeling today?", authorName: "Eva", date: Date().addingTimeInterval(-3600), isFromUser: false),
         ChatMessage(id: 2, body: "Hi Eva! I'm feeling a bit tired today.", authorName: "User", date: Date().addingTimeInterval(-3500), isFromUser: true),

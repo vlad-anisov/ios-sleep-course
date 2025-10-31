@@ -38,4 +38,8 @@ final class Settings {
     init() {
         _notificationTime = Calendar.current.date(from: DateComponents(hour: 23, minute: 0)) ?? Date()
     }
+
+    static func primary(from collection: [Settings]) -> Settings? {
+        collection.first
+    }
 }

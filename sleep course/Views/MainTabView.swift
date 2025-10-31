@@ -14,10 +14,14 @@ struct MainTabView: View {
                 ArticlesView()
             }
             Tab("Ритуал", systemImage: "checkmark.circle"){
-                RitualView(ritual: allRituals.first!)
+                if let ritual = Ritual.primaryRitual(from: allRituals) {
+                    RitualView(ritual: ritual)
+                }
             }
             Tab("Настройки", systemImage: "gear"){
-                SettingsView(settings: allSettings.first!)
+                if let settings = Settings.primary(from: allSettings) {
+                    SettingsView(settings: settings)
+                }
             }
         }
     }

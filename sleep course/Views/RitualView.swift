@@ -12,7 +12,7 @@ struct RitualView: View {
     @State private var createTaskName = ""
     @FocusState private var isCreateTaskFieldFocused: Bool
     private var lines: [RitualLine] {
-        ritual.lines.sorted { $0.sequence < $1.sequence }
+        ritual.activeLines
     }
     
     var body: some View {
@@ -22,7 +22,7 @@ struct RitualView: View {
                     HStack(spacing: 15) {
                         Button {
                             withAnimation {
-                                line.isCheck.toggle()
+                                ritual.toggleCheck(for: line)
                             }
                         } label: {
                             if line.isCheck {
@@ -51,12 +51,10 @@ struct RitualView: View {
                     .shadow(color: line.isCheck && !isEditing ? .blue : .clear, radius: 40, x: 0, y: 0)
                 }
                 .onMove { from, to in
-                    var ordered = lines
-                    ordered.move(fromOffsets: from, toOffset: to)
-                    ordered.enumerated().forEach { $1.sequence = $0 }
+                    ritual.moveLines(fromOffsets: from, toOffset: to)
                 }
                 .onDelete {
-                    lines[$0.first!].ritual = nil
+                    ritual.removeLines(at: $0, in: modelContext)
                 }
                 .padding(.horizontal, 5)
                 if isEditing {
@@ -79,9 +77,9 @@ struct RitualView: View {
             }
             .environment(\.editMode, $mode)
             .sheet(isPresented: $showingAddSheet) {
-                List(allLines.filter { $0.ritual?.id != ritual.id }) { line in
+                List(ritual.availableLines(from: allLines)) { line in
                     Button(line.name) {
-                        line.ritual = ritual
+                        ritual.attachExistingLine(line, in: modelContext)
                         showingAddSheet = false
                     }
                     .listRowBackground(Color("MessageColor"))
@@ -103,9 +101,7 @@ struct RitualView: View {
                             isCreateTaskFieldFocused = true
                         }
                     Button(role: .confirm) {
-                        let sequence = (ritual.lines.map(\.sequence).max() ?? -1) + 1
-                        let line = RitualLine(name: createTaskName, ritual: ritual)
-                        line.sequence = sequence
+                        _ = ritual.addCustomLine(named: createTaskName, in: modelContext)
                         showingAddSheet = false
                     }
                     Button(role: .close) {}
